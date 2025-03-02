@@ -14,5 +14,5 @@ cd ../admin_server && npm install && node server.js
 ```
 
 ### 3. Открываем в браузере:
-Клиентская часть через GraphQL: http://localhost:3003
+Клиентская часть через GraphQL: http://localhost:3003  
 Админ-панель через API: http://localhost:8083
