@@ -6,6 +6,8 @@ const PORT = 8083;
 
 app.use(express.json());
 
+app.use(express.static(path.join(__dirname, '../frontend')));
+
 const filePath = path.join(__dirname, '../products.json');
 
 // Получить все товары
@@ -48,5 +50,25 @@ app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/admin.html'));
 });
 
+app.use((req, res, next) => {
+    console.log(`Запрос: ${req.method} ${req.url}`);
+    next();
+});
+
+// Тестовый маршрут для ошибки 500
+//app.get('/error', (req, res, next) => {
+//    next(new Error('Тестовая ошибка 500')); // Вызываем ошибку
+//});
+
+// Обработка ошибки 404
+app.use((req, res) => {
+    res.status(404).sendFile(path.join(__dirname, '../frontend/error_404.html'));
+});
+
+// Обработка ошибки 500
+app.use((err, req, res, next) => {
+    console.error('Ошибка 500:', err.stack); // Логируем ошибку
+    res.status(500).sendFile(path.join(__dirname, '../frontend/error_500.html'));
+});
 
 app.listen(PORT, () => console.log(`[NOTE] Admin server running at http://localhost:${PORT}`));
