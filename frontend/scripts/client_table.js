@@ -11,7 +11,7 @@ async function loadProducts() {
 function renderCategories() {
     const categoriesContainer = document.getElementById('categories');
     const categories = new Set();
-    
+
     allProducts.forEach(product => {
         product.categories.forEach(category => categories.add(category));
     });
@@ -19,8 +19,8 @@ function renderCategories() {
     categoriesContainer.innerHTML = `
         <button class="btn btn-outline-primary m-1" onclick="filterByCategory(null)">Все коты</button>
         ${Array.from(categories).map(category =>
-            `<button class="btn btn-outline-primary m-1" onclick="filterByCategory('${category}')">${category}</button>`
-        ).join('')}
+        `<button class="btn btn-outline-primary m-1" onclick="filterByCategory('${category}')">${category}</button>`
+    ).join('')}
     `;
 }
 
@@ -28,7 +28,7 @@ function renderProducts() {
     const container = document.getElementById('products');
     container.innerHTML = '';
 
-    const filteredProducts = selectedCategory 
+    const filteredProducts = selectedCategory
         ? allProducts.filter(product => product.categories.includes(selectedCategory))
         : allProducts;
 

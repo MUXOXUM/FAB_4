@@ -1,8 +1,15 @@
+require('dotenv').config({ path: '../.env' });
+const clientPort = parseInt(process.env.CLIENT_PORT, 10);
+
+if (isNaN(clientPort)) {
+    console.error("CLIENT_PORT должен быть числом. Проверьте ваш .env файл.");
+    process.exit(1); // Завершаем процесс с ошибкой
+}
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const PORT = 3003;
 
 app.use(express.static(path.join(__dirname, '../frontend')));
 
@@ -36,5 +43,5 @@ app.use((err, req, res, next) => {
     res.status(500).sendFile(path.join(__dirname, '../frontend/error_500.html'));
 });
 
-app.listen(PORT, () => console.log(`[NOTE] Client server running at http://localhost:${PORT}`));
+app.listen(clientPort, () => console.log(`[NOTE] Client сервер запущен на http://localhost:${clientPort}`));
 

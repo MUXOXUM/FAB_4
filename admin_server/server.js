@@ -1,11 +1,17 @@
+require('dotenv').config({ path: '../.env' });
+const adminPort = parseInt(process.env.ADMIN_PORT, 10);
+
+if (isNaN(adminPort)) {
+    console.error("ADMIN_PORT должен быть числом. Проверьте ваш .env файл.");
+    process.exit(1); // Завершаем процесс с ошибкой
+}
+
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
 const app = express();
-const PORT = 8083;
 
 app.use(express.json());
-
 app.use(express.static(path.join(__dirname, '../frontend')));
 
 const filePath = path.join(__dirname, '../products.json');
@@ -71,4 +77,4 @@ app.use((err, req, res, next) => {
     res.status(500).sendFile(path.join(__dirname, '../frontend/error_500.html'));
 });
 
-app.listen(PORT, () => console.log(`[NOTE] Admin server running at http://localhost:${PORT}`));
+app.listen(adminPort, () => console.log(`[NOTE] Admin сервер запущен на http://localhost:${adminPort}`));
