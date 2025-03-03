@@ -2,8 +2,23 @@ let allProducts = [];
 let selectedCategory = null;
 
 async function loadProducts() {
-    const response = await fetch('/api/products');
-    allProducts = await response.json();
+    const query = `{
+        products {
+            name
+            price
+            categories
+        }
+    }`;
+
+    const response = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query })
+    });
+
+    const result = await response.json();
+    allProducts = result.data.products;
+    console.log(allProducts)
     renderCategories();
     renderProducts();
 }
@@ -44,7 +59,6 @@ function renderProducts() {
                     <div class="card-body">
                         <h5 class="card-title">${product.name}</h5>
                         <h6 class="card-subtitle mb-2 text-muted">${product.price} ₽</h6>
-                        <p class="card-text">${product.description}</p>
                         <p><strong>Породы:</strong> ${product.categories.join(', ')}</p>
                     </div>
                 </div>

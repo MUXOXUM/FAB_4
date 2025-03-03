@@ -9,28 +9,58 @@ if (isNaN(clientPort)) {
 const express = require('express');
 const path = require('path');
 const fs = require('fs');
+const { graphqlHTTP } = require('express-graphql');
+const { buildSchema } = require('graphql');
 const app = express();
 
+// Создаем схему GraphQL
+const schema = buildSchema(`
+    type Product {
+        id: Int
+        name: String
+        price: String
+        description: String
+        categories: [String]
+    }
+
+    type Query {
+        products: [Product]
+        product(id: Int!): Product
+    }
+`);
+
+const readProductsData = () => {
+    return JSON.parse(fs.readFileSync(path.join(__dirname, '../products.json'), 'utf-8'));
+};
+
+const root = {
+    products: () => readProductsData(),
+    product: ({ id }) => {
+        const products = readProductsData();
+        return products.find(product => product.id === id);
+    }
+};
+
+// Настроим GraphQL сервер
+app.use('/graphql', graphqlHTTP({
+    schema: schema,
+    rootValue: root,
+    graphiql: true, // Включаем GraphiQL для тестирования запросов через браузер
+}));
+
+// Статичные файлы
 app.use(express.static(path.join(__dirname, '../frontend')));
 
-app.get('/api/products', (req, res) => {
-    const data = fs.readFileSync(path.join(__dirname, '../products.json'), 'utf-8');
-    res.json(JSON.parse(data));
-});
-
+// Основной маршрут
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/client.html'));
 });
 
+// Логирование запросов
 app.use((req, res, next) => {
     console.log(`Запрос: ${req.method} ${req.url}`);
     next();
 });
-
-// Тестовый маршрут для ошибки 500
-//app.get('/error', (req, res, next) => {
-//    next(new Error('Тестовая ошибка 500')); // Вызываем ошибку
-//});
 
 // Обработка ошибки 404
 app.use((req, res) => {
@@ -43,5 +73,5 @@ app.use((err, req, res, next) => {
     res.status(500).sendFile(path.join(__dirname, '../frontend/error_500.html'));
 });
 
+// Запуск сервера
 app.listen(clientPort, () => console.log(`[NOTE] Client сервер запущен на http://localhost:${clientPort}`));
-
